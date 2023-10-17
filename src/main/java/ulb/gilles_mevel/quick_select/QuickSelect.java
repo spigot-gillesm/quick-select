@@ -14,10 +14,10 @@ public class QuickSelect<T> {
 	}
 
 	/**
-	 * Find the k-th smallest (or greatest) element, depending on findGreatest value.
+	 * Find the k-th smallest/greatest element in this instance's array, depending on findGreatest value.
 	 *
 	 * @param findGreatest whether this instance should look for the greatest k-th element instead of smallest
-	 * @return the value of the k-th smallest (or greatest) element
+	 * @return the value of the k-th smallest/greatest element
 	 */
 	public T findKElement(final int k, final boolean findGreatest) {
 		int effectiveK = k;
@@ -43,34 +43,25 @@ public class QuickSelect<T> {
 			return get(0);
 		}
 
-		return findKElement(k, 0, elements.length);
+		return findKElement(k, 0, elements.length-1);
 	}
 
+	/**
+	 * Find the k-th smallest element in this instance's array, between the left and right index.
+	 *
+	 * @return the value of the k-th smallest element
+	 */
 	private T findKElement(final int k, final int left, final int right) {
-		int upperBound = right;
-		int lowerBound = left;
+		int pivotIndex = random.nextInt(right - left + 1) + left;
+		pivotIndex = partition(left, right, pivotIndex);
 
-		while(upperBound != lowerBound) {
-			int pivotIndex = random.nextInt(upperBound - lowerBound) + lowerBound;
-			pivotIndex = partition(lowerBound, upperBound, pivotIndex);
-
-			//Should the partition be made of only equivalent values, return said value
-			if((upperBound - lowerBound <= 2) && elements[lowerBound].equals(elements[upperBound-1])) {
-				return get(lowerBound);
-			}
-			//If the found pivot is == to k, the the right value was found
-			if(pivotIndex == k) {
-				return get(pivotIndex);
-			//If k is smaller than the pivot index, the value the algorithm is looking for is on the left of the pivot index
-			} else if(k < pivotIndex) {
-				upperBound = pivotIndex;
-			//If k is bigger than the pivot index, the value the algorithm is looking for is on the right of the pivot index
-			} else {
-				lowerBound = pivotIndex;
-			}
+		if(pivotIndex == k) {
+			return get(pivotIndex);
+		} else if(pivotIndex < k) {
+			return findKElement(k, pivotIndex + 1, right);
+		} else {
+			return findKElement(k, left, pivotIndex - 1);
 		}
-
-		return get(left);
 	}
 
 	/**
@@ -91,18 +82,18 @@ public class QuickSelect<T> {
 		//Get value at pivotIndex
 		final T pivotValue = get(pivotIndex);
 		//Push the pivotValue to the end of the partition
-		swap(pivotIndex, right-1);
+		swap(pivotIndex, right);
 
 		int currentIndex = left;
 
-		for(int i = left; i < right; i++) {
+		for(int i = left; i <= right; i++) {
 			if(elements[i].compareTo(pivotValue) < 0) {
 				swap(i, currentIndex);
 				currentIndex++;
 			}
 		}
 		//Put back the index value at its 'final' place, i.e. leftValues <= pivotValue <= rightValues
-		swap(currentIndex, right-1);
+		swap(currentIndex, right);
 
 		//Return the index at which the value of pivotIndex (the parameter) is now positioned
 		return currentIndex;
