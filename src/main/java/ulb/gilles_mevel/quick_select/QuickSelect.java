@@ -9,6 +9,8 @@ public class QuickSelect<T> {
 
 	private final Random random = new SecureRandom();
 
+	private int comparisons = 0;
+
 	public QuickSelect(final Comparable<T>[] elements) {
 		this.elements = elements;
 	}
@@ -56,10 +58,13 @@ public class QuickSelect<T> {
 		pivotIndex = partition(left, right, pivotIndex);
 
 		if(pivotIndex == k) {
+			comparisons++;
 			return get(pivotIndex);
 		} else if(pivotIndex < k) {
+			comparisons++;
 			return findKElement(k, pivotIndex + 1, right);
 		} else {
+			comparisons++;
 			return findKElement(k, left, pivotIndex - 1);
 		}
 	}
@@ -87,6 +92,8 @@ public class QuickSelect<T> {
 		int currentIndex = left;
 
 		for(int i = left; i <= right; i++) {
+			comparisons++;
+
 			if(elements[i].compareTo(pivotValue) < 0) {
 				swap(i, currentIndex);
 				currentIndex++;
@@ -112,6 +119,10 @@ public class QuickSelect<T> {
 	@SuppressWarnings("unchecked")
 	private T get(final int i) {
 		return (T) elements[i];
+	}
+
+	public int getComparisons() {
+		return comparisons;
 	}
 
 }
